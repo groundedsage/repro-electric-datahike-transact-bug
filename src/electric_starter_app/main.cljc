@@ -48,16 +48,17 @@
             (add-contact (nano-id)))))
 
 
-(e/defn Add-contact [new-contact]
+(e/defn Add-contact [] 
   (e/server 
-    (e/Offload #(try 
-                  (swap! !toggle not)
-                  (println "Add contact" new-contact) 
+     (let [new-contact (nano-id)]
+       (e/Offload #(try 
+                     (swap! !toggle not)
+                     (println "Add contact" new-contact) 
 
                   ;; Why does this freeze electric app?
-                  ;; (add-contact new-contact)
-                  ::ok
-                  (catch Exception e (doto ::fail (prn e)))))))
+                  (add-contact new-contact)
+                     ::ok
+                     (catch Exception e (doto ::fail (prn e))))))))
 
 (e/defn Effects []
   (e/client
@@ -79,7 +80,7 @@
                                                                  (get-user-data db user1-id) 
                                                                  (catch Exception e (prn "Failure in: get-contacts" e))))))))
         (dom/h1 (dom/text "Server toggle: " (e/server (e/watch !toggle))))
-        (Service (Button! [`Add-contact (nano-id)]
+        (Service (Button! [`Add-contact]
                    :label "Add to contacts"))))))
 
 (comment 
